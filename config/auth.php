@@ -14,7 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
+        'guard' => 'api',
         'passwords' => 'users',
     ],
 
@@ -35,18 +35,18 @@ return [
     |
     */
 
-    // 'guards' => [
-    //     'web' => [
-    //         'driver' => 'session',
-    //         'provider' => 'users',
-    //     ],
+    'guards' => [
+        'web' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
 
-    //     'api' => [
-    //         'driver' => 'token',
-    //         'provider' => 'users',
-    //         'hash' => false,
-    //     ],
-    // ],
+        'api' => [
+            'driver' => 'jwt',
+            'provider' => 'users',
+            'hash' => false,
+        ],
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -113,23 +113,5 @@ return [
     */
 
     'password_timeout' => 10800,
-    'defaults' => [
-        'guard' => 'api',
-        'passwords' => 'users',
-    ],
-
-
-    'guards' => [
-        'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
-        ],
-
-        'api' => [
-            'driver' => 'jwt',
-            'provider' => 'users',
-            'hash' => false,
-        ],
-    ],
 
 ];

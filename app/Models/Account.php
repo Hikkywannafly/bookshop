@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Facades\JWTAuth as FacadesJWTAuth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class Account extends Model implements JWTSubject
 {
@@ -78,7 +79,7 @@ class Account extends Model implements JWTSubject
                         'email' => $email,
                         'name' => $name,
                         'phone' => $phone,
-                        'password' => Hash::make($password),
+                        'password' => ($password),
                         'role' => 'user',
                         'status' => false,
                     ]);
@@ -111,18 +112,34 @@ class Account extends Model implements JWTSubject
                 'message' => $validated->errors()
             ], 422);
         }
-        $account =  Account::where('email', $request->email)->first();
-        if (!$account || Hash::check($request->password, $account->password) == false) {
+        $email = $request->input('email');
+
+        // $account =  Account::where('email', $request->email)->first();
+        // if (!$account || Hash::check($request->password, $account->password) == false) {
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => 'Password or email is incorrect',
+        //     ], Response::HTTP_BAD_REQUEST);
+        // }
+        // $token = FacadesJWTAuth::attempt($validated->validated());
+        // $account->update([
+        //     'refresh_token' => $token
+        // ]);
+        if (!$token = FacadesJWTAuth::fromUser($validated->validated())) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Password or email is incorrect',
             ], Response::HTTP_BAD_REQUEST);
         }
-        $token = FacadesJWTAuth::fromUser($account);
-        // $account->update([
-        //     'refresh_token' => $token
-        // ]);
-        return Account::createNewToken($token, $account);
+        // if (!$token = Auth::guard('api')->attempt($input)) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'token' => $token,
+        //         'message' => 'Invalid Email or Password',
+        //     ], 401);
+        // }
+
+        return Account::createNewToken($token, $input);
     }
 
 
@@ -157,10 +174,20 @@ class Account extends Model implements JWTSubject
     protected function createNewToken($token, $account)
     {
         return response()->json([
+            'status' => 'success',
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' =>  FacadesJWTAuth::factory()->getTTL() * 60,
             'user' => $account,
         ],  Response::HTTP_OK);
+    }
+    public static function refreshToken()
+    {
+        return Account::createNewAccessToken(FacadesJWTAuth::refresh());
+    }
+    public static function logout()
+    {
+        FacadesJWTAuth::logout();
+        return response()->json(['message' => 'User successfully signed out']);
     }
 }

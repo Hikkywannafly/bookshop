@@ -16,7 +16,7 @@ class AuthController extends Controller
     //
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'testapi']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register',]]);
     }
 
 
@@ -25,18 +25,20 @@ class AuthController extends Controller
     }
     public function register(Request $request)
     {
-        return Account::register($request);
+        return User::register($request);
     }
 
     public function login(Request $request)
     {
-        return Account::login($request);
+        return User::login($request);
     }
     public function logout(Request $request)
     {
+        return User::logout();
     }
-    public function refreshToken(Request $request)
+    public function refreshToken()
     {
+        return User::refreshToken();
     }
     public function updateUserProfile(Request $request)
     {
@@ -51,10 +53,6 @@ class AuthController extends Controller
 
     public function testapi()
     {
-        return User::create([
-            'name' => 'Hikkywananfly',
-            'email' => 'test@gmail.com',
-            'password' => 'test@gmail.com',
-        ]);
+        return response()->json(['message' => 'test api']);
     }
 }

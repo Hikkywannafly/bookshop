@@ -24,8 +24,6 @@ Route::get('/user', [AuthController::class, 'user']);
 Route::group([
     'middleware' => 'api',
     'prefix' => 'auth'
-
-
 ], function ($router) {
 
     Route::post('/register', [AuthController::class, 'register']);
