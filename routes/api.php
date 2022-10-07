@@ -3,6 +3,9 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EmailVerificationController;
+use App\Http\Controllers\VerificationController;
+use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -18,7 +21,7 @@ use App\Http\Controllers\AuthController;
 //     return $request->user();
 // });
 
-// test api : http://127.0.0.1:8000/api/v1/auth/testapi
+// test api : http://127.0.0.1:8000/api/auth/testapi
 Route::get('/user', [AuthController::class, 'user']);
 
 Route::group([
@@ -26,9 +29,9 @@ Route::group([
     'prefix' => 'auth'
 ], function ($router) {
 
-    Route::post('/register', [AuthController::class, 'register']);
-
     Route::post('/login', [AuthController::class, 'login']);
+
+    Route::post('/register', [AuthController::class, 'register']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 
@@ -37,6 +40,10 @@ Route::group([
     Route::post('/update', [AuthController::class, 'updateUserProfile']);
 
     Route::get('/testapi', [AuthController::class, 'testapi']);
+
+    Route::post('email/verification-notification', [VerificationController::class, 'sendVerificationEmail']);
+
+    Route::get('verify-email/{id}/{hash}', [VerificationController::class, 'verify'])->name('verification.verify');
 });
 
 

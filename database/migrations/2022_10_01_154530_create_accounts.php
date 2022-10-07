@@ -22,6 +22,9 @@ class CreateAccounts extends Migration
             $table->string('image_address')->nullable();
             $table->string('role')->default('user');
             $table->boolean('status')->default(false);
+            $table->boolean('confirm');
+            $table->string('confirmation_code')->default(NULL);
+            $table->dateTime('confirmation_code_expired_in')->default(NULL);
             $table->timestamps();
         });
     }
