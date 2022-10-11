@@ -77,16 +77,4 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         return [];
     }
 
-
-
-    public static function refreshToken()
-    {
-        return User::createNewAccessToken(auth()->refresh());
-    }
-
-    public static function logout()
-    {
-        FacadesJWTAuth::logout();
-        return response()->json(['message' => 'User successfully signed out']);
-    }
 }

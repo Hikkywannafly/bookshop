@@ -41,9 +41,11 @@ Route::group([
 
     Route::get('/testapi', [AuthController::class, 'testapi']);
 
-    Route::post('email/verification-notification', [VerificationController::class, 'sendVerificationEmail']);
+    Route::post('/email/verification-notification', [VerificationController::class, 'sendVerificationEmail']);
 
-    Route::get('verify-email/{id}/{hash}', [VerificationController::class, 'verify'])->name('verification.verify');
+    Route::get('/verify-email/{id}/{hash}', [VerificationController::class, 'verify'])->name('verification.verify');
+
+    Route::get('/email/testapi1', [VerificationController::class, 'testapi1']);
 });
 
 

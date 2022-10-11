@@ -11,21 +11,25 @@ class VerificationController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => [
-            'verify-email/{id}/{hash}', 'email/verification-notification'
+            'verify-email/{id}/{hash}', 'email/verification-notification', 'verify'
         ]]);
     }
     public function sendVerificationEmail(Request $request)
     {
         if ($request->user()->hasVerifiedEmail()) {
             return  response()->json([
-                'message' => 'Already Verified'
+                'message' => 'Already Verified',
+                'test' =>  $request->user()->hasVerifiedEmail()
             ]);
         }
 
         $request->user()->sendEmailVerificationNotification();
 
 
-        return response()->json(['status' => 'verification-link-sent']);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Verification link sent on your email id'
+        ]);
     }
 
     public function verify(EmailVerificationRequest $request)
@@ -43,6 +47,12 @@ class VerificationController extends Controller
         return response()->json([
             'message' => 'Email has been verified',
             'request' => $request
+        ]);
+    }
+    public function testapi1()
+    {
+        return response()->json([
+            'message' => 'Hello World'
         ]);
     }
 }

@@ -24,7 +24,7 @@ class AuthController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => [
-            'login', 'register', 'email/verification-notification', 'testapi'
+            'login', 'register',
         ]]);
     }
     public function register(Request $request)
@@ -58,13 +58,10 @@ class AuthController extends Controller
                 $validated->validated(),
                 [
                     'password' => bcrypt($request->password),
-                    'confirm' => false,
-                    'confirmation_code' => rand(100000, 999999),
-                    'confirmation_code_expired_in' => Carbon::now()->addSecond(60)
                 ]
             ));
             try {
-                // Mail::to($user->email)->send(new UserVerification($user));
+
                 event(new Registered($user));
 
                 return response()->json([
@@ -81,8 +78,6 @@ class AuthController extends Controller
                     'error' => $err->getMessage()
                 ], 500);
             }
-
-            // event(new Registered($user))
         }
     }
 
@@ -100,10 +95,17 @@ class AuthController extends Controller
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
         $user = User::where('email', $request->email)->first();
-        if (!$user->emailverify) {
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Password or email is incorrect'
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+        if (!$user->email_verified_at) {
             return response()->json([
                 'status' => 'verify',
-                'message' => 'Please verify your email address before login'
+                'message' => 'Please verify your email address before login',
+                'access_token' => auth()->attempt($validator->validated()),
             ], Response::HTTP_UNAUTHORIZED);
         }
         if (!$token = auth()->attempt($validator->validated())) {
@@ -118,11 +120,21 @@ class AuthController extends Controller
 
     public function logout()
     {
-        return User::logout();
+        auth()->logout();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Logged out successfully'
+        ], 200);
     }
     public function refreshToken()
     {
-        return User::refreshToken();
+        $tokenRefresh = auth()->refresh();
+        // return $this->createNewAccessToken(auth()->refresh());
+        return response()->json([
+            'status' => 'success',
+            'access_token' => $tokenRefresh,
+            'token_type' => 'bearer',
+        ]);
     }
     public function updateUserProfile(Request $request)
     {
@@ -169,21 +181,3 @@ class AuthController extends Controller
         ]);
     }
 }
-
-            // $mail->SMTPDebug = 0;
-            // $mail->isSMTP();
-            // $mail->Host = 'smtp.gmail.com';
-            // $mail->SMTPAuth = true;
-            // $mail->Username = 'ggraygon@gmail.com';
-            // $mail->Password = 'wbhfkresydraogfr';
-            // $mail->SMTPSecure = 'tls';
-            // $mail->Port = 587;
-            // $mail->setFrom('ggraygon@gmail.com', 'HouseHub');
-            // $mail->addAddress('hieudao2906@gmail.com');
-            // $mail->isHTML(true);
-            // $mail->Subject = 'Reset password';
-            // $mail->Body    = 'Mật khẩu mới của bạn là: ';
-            // $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
-            // if (!$mail->send()) {
-            //     return response(['message' => 'Error'], Response::HTTP_BAD_REQUEST);
-            // }
