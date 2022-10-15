@@ -23,9 +23,6 @@ class CreateUsersTable extends Migration
             $table->string('role')->default('user');
             $table->boolean('status')->default(false);
             $table->timestamp('email_verified_at')->nullable();
-            // $table->boolean('confirm')->default(false);
-            // $table->string('confirmation_code')->nullable();
-            // $table->dateTime('confirmation_code_expired_in')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
