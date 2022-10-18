@@ -24,6 +24,11 @@ class CreateBooksTable extends Migration
             $table->foreignId('category_id')->constrained();
             $table->foreignId('sub_category_id')->constrained();
             $table->foreignId('book_detail_id')->constrained();
+            // $table->unsignedBigInteger('sub_category_id');
+            // $table->foreign('sub_category_id')->references('sub_category_id')->on('category_subcategory');
+            // $table->unsignedBigInteger('category_id');
+            // $table->foreign('category_id')->references('category_id')->on('category_subcategory');
+
             // $table->unsignedBigInteger('discount_id')->nullable();
             // $table->unsignedBigInteger('category_id');
             // $table->unsignedBigInteger('sub_category_id');

@@ -15,6 +15,7 @@ class SubCategoryFactory extends Factory
     {
         return [
             //
+            
         ];
     }
 }

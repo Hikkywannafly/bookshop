@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Faker\Factory;
 use Illuminate\Database\Seeder;
 
 class BookSeeder extends Seeder
@@ -13,6 +14,6 @@ class BookSeeder extends Seeder
      */
     public function run()
     {
-        //
+        Factory::create()->seed(20, 'App\Models\Book');
     }
 }

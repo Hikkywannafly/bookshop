@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\VerificationController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SubCategoryController;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +50,9 @@ Route::group([
     Route::get('/email/testapi1', [VerificationController::class, 'testapi1']);
 });
 
+Route::get('/category/{slug}', [CategoryController::class, 'getCategory'])->middleware('check.category');
+
+Route::get('/category/{slug}/{sub_slug}', [SubCategoryController::class, 'textApi'])->middleware('check.category');
 
 Route::get('/test', function () {
     return response()->json([

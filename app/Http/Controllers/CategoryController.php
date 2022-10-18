@@ -8,6 +8,10 @@ use App\Http\Requests\UpdateCategoryRequest;
 
 class CategoryController extends Controller
 {
+    public function getCategory()
+    {
+       
+    }
     /**
      * Display a listing of the resource.
      *

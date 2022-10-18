@@ -8,6 +8,12 @@ use App\Http\Requests\UpdateSubCategoryRequest;
 
 class SubCategoryController extends Controller
 {
+    public function textApi()
+    {
+        return response()->json([
+            'message' => 'Hikkywananfly'
+        ]);
+    }
     /**
      * Display a listing of the resource.
      *
