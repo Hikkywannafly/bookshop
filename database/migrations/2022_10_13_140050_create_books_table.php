@@ -20,10 +20,11 @@ class CreateBooksTable extends Migration
             $table->string('default_image');
             $table->string('slug');
             $table->integer('quantity');
+            $table->integer('discount')->default(0);
             $table->foreignId('discount_id')->nullable()->constrained();
             $table->foreignId('category_id')->constrained();
             $table->foreignId('sub_category_id')->constrained();
-            $table->foreignId('book_detail_id')->constrained();
+            $table->foreignId('book_detail_id')->nullable()->constrained();
             // $table->unsignedBigInteger('sub_category_id');
             // $table->foreign('sub_category_id')->references('sub_category_id')->on('category_subcategory');
             // $table->unsignedBigInteger('category_id');

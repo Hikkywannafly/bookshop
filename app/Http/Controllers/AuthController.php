@@ -10,13 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Facades\JWTAuth as FacadesJWTAuth;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Auth\Events\Registered;
-
 use Symfony\Component\HttpFoundation\Response;
-use Carbon\Carbon;
-use App\Mail\UserVerification;
-use App\Mail\TestMail;
-use Illuminate\Support\Facades\Mail;
-use PHPMailer\PHPMailer\PHPMailer;
 
 class AuthController extends Controller
 {
@@ -24,7 +18,7 @@ class AuthController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => [
-            'login', 'register',
+            'login', 'register', 'refreshToken'
         ]]);
     }
     public function register(Request $request)

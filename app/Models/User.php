@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Facades\JWTAuth as FacadesJWTAuth;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Auth\Events\Registered;
-use PHPMailer\PHPMailer\PHPMailer;
+
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements JWTSubject, MustVerifyEmail
 {
@@ -31,6 +32,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
         'email',
         'password',
         'image_address',
+        'email_verified_at',
         'role',
         'status',
 
@@ -76,5 +78,4 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
     {
         return [];
     }
-
 }

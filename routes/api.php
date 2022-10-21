@@ -3,11 +3,13 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AuthSocialController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SubCategoryController;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -33,11 +35,15 @@ Route::group([
 
     Route::post('/login', [AuthController::class, 'login']);
 
+    Route::post('/login-with-google', [AuthController::class, 'loginWithGoogle']);
+
+    Route::post('/register-with-google', [AuthController::class, 'registerWithGoogle']);
+
     Route::post('/register', [AuthController::class, 'register']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::post('/refresh', [AuthController::class, 'refreshToken']);
+    Route::get('/refresh', [AuthController::class, 'refreshToken']);
 
     Route::post('/update', [AuthController::class, 'updateUserProfile']);
 
@@ -50,9 +56,11 @@ Route::group([
     Route::get('/email/testapi1', [VerificationController::class, 'testapi1']);
 });
 
-Route::get('/category/{slug}', [CategoryController::class, 'getCategory'])->middleware('check.category');
+Route::post('/auth/google', [AuthSocialController::class, 'handleLoginGoogle']);
 
-Route::get('/category/{slug}/{sub_slug}', [SubCategoryController::class, 'textApi'])->middleware('check.category');
+Route::get('/category/{slug}.html', [CategoryController::class, 'getCategory'])->middleware('check.category');
+
+Route::get('/category/{slug}/{sub_slug}.html', [SubCategoryController::class, 'textApi'])->middleware('check.category');
 
 Route::get('/test', function () {
     return response()->json([

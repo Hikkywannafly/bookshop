@@ -5,12 +5,22 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
-    public function getCategory()
+    public function getCategory(Request $request)
     {
-       
+        $category_id = DB::table('categories')->where('slug', $request->slug)->first()->id;
+        $category_sub = DB::table('sub_categories')->where('category_id', $category_id)->get();
+        $books = DB::table('books')->where('category_id', $category_id)->get(['id', 'name', 'price', 'default_image', 'slug']);
+        return response()->json([
+            'status' => 'success',
+            'category_sub' => $category_sub,
+            'books' => $books
+
+        ], 200);
     }
     /**
      * Display a listing of the resource.
