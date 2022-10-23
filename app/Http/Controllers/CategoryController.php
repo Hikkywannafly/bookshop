@@ -12,15 +12,74 @@ class CategoryController extends Controller
 {
     public function getCategory(Request $request)
     {
-        $category_id = DB::table('categories')->where('slug', $request->slug)->first()->id;
-        $category_sub = DB::table('sub_categories')->where('category_id', $category_id)->get();
-        $books = DB::table('books')->where('category_id', $category_id)->get(['id', 'name', 'price', 'default_image', 'slug']);
-        return response()->json([
-            'status' => 'success',
-            'category_sub' => $category_sub,
-            'books' => $books
+        try {
 
-        ], 200);
+            $category_id = DB::table('categories')->where('slug', $request->slug)->first()->id;
+            $book_quantity = DB::table('books')->where('category_id', '=', $category_id)->count();
+            $books = DB::table('books')
+                ->leftJoin('ratings', 'books.id', '=', 'ratings.book_id')
+                ->select([
+                    'books.id', 'books.name', 'books.slug', 'books.default_image', 'books.price', 'discount',
+                    DB::raw('AVG(ratings.rating) as rating')
+                ])
+                ->where('category_id', '=', $category_id)
+                ->groupBy('books.id')
+                ->get();
+
+            return response()->json([
+                'status' => 'success',
+                'records' => $book_quantity,
+                'books' => $books
+
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getSuppliers(Request $request)
+    {
+        try {
+            $category_id = DB::table('categories')
+                ->where('slug', $request->slug)->first();
+
+            $sub_category_id = DB::table('sub_categories')
+                ->where('slug', $request->slug)->first();
+
+            if ($category_id) {
+                $suppliers = DB::table('books')
+                    ->leftJoin('suppliers', 'books.supplier_id', '=', 'suppliers.id')
+                    ->select([
+                        'suppliers.id', 'suppliers.name', 'suppliers.slug', 'suppliers.logo'
+                    ])
+                    ->where('category_id', '=', $category_id->id)
+                    ->groupBy('suppliers.id')
+                    ->get();
+            }
+            if ($sub_category_id) {
+                $suppliers = DB::table('books')
+                    ->leftJoin('suppliers', 'books.supplier_id', '=', 'suppliers.id')
+                    ->select([
+                        'suppliers.id', 'suppliers.name', 'suppliers.slug', 'suppliers.logo'
+                    ])
+                    ->where('sub_category_id', '=', $sub_category_id->id)
+                    ->groupBy('suppliers.id')
+                    ->get();
+            }
+            return response()->json([
+                'status' => 'success',
+                'suppliers' => $suppliers,
+
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Not found'
+            ], 500);
+        }
     }
     /**
      * Display a listing of the resource.

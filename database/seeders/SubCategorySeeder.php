@@ -22,9 +22,39 @@ class SubCategorySeeder extends Seeder
                     'slug' => 'van-hoc-nuoc-ngoai',
                 ],
                 [
+                    'category_id' => 1,
+                    'name' => 'văn học trong nước',
+                    'slug' => 'van-hoc-trong-nuoc',
+                ],
+                [
+                    'category_id' => 1,
+                    'name' => 'light novel',
+                    'slug' => 'light-novel',
+                ],
+                [
+                    'category_id' => 1,
+                    'name' => 'tiểu thuyết',
+                    'slug' => 'tieu-thuyet',
+                ],
+                [
+                    'category_id' => 1,
+                    'name' => 'ngôn tình',
+                    'slug' => 'ngon-tinh',
+                ],
+                [
                     'category_id' => 2,
                     'name' => 'tâm lý',
                     'slug' => 'tam-ly',
+                ],
+                [
+                    'category_id' => 2,
+                    'name' => 'kinh tế trong nước',
+                    'slug' => 'kinh-te-trong-nuoc',
+                ],
+                [
+                    'category_id' => 2,
+                    'name' => 'kinh tế nước ngoài',
+                    'slug' => 'kinh-te-nuoc-ngoai',
                 ],
                 [
                     'category_id' => 3,

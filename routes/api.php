@@ -58,9 +58,15 @@ Route::group([
 
 Route::post('/auth/google', [AuthSocialController::class, 'handleLoginGoogle']);
 
-Route::get('/category/{slug}.html', [CategoryController::class, 'getCategory'])->middleware('check.category');
+Route::get('/category/{slug}', [CategoryController::class, 'getCategory'])->middleware('check.category');
 
-Route::get('/category/{slug}/{sub_slug}.html', [SubCategoryController::class, 'textApi'])->middleware('check.category');
+Route::get('/category/{slug}/{sub_slug}', [SubCategoryController::class, 'getSubCategory'])->middleware('check.category');
+
+Route::get('/suppliers/{slug}', [CategoryController::class, 'getSuppliers']);
+
+// Route::get('/suppliers/{sub_slug}', [SubCategoryController::class, 'getSuppliers']);
+
+
 
 Route::get('/test', function () {
     return response()->json([

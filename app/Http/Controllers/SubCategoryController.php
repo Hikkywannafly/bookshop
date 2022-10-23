@@ -5,14 +5,43 @@ namespace App\Http\Controllers;
 use App\Models\SubCategory;
 use App\Http\Requests\StoreSubCategoryRequest;
 use App\Http\Requests\UpdateSubCategoryRequest;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class SubCategoryController extends Controller
 {
-    public function textApi()
+    public function getSubCategory(Request $request)
     {
+        $sub_category_id = DB::table('sub_categories')->where('slug', $request->sub_slug)->first()->id;
+        $book_quantity = DB::table('books')->where('sub_category_id', '=', $sub_category_id)->count();
+        $books = DB::table('books')
+            ->leftJoin('ratings', 'books.id', '=', 'ratings.book_id')
+            ->select([
+                'books.id', 'books.name', 'books.slug', 'books.default_image', 'books.price', 'discount',
+                DB::raw('AVG(ratings.rating) as rating')
+            ])
+            ->where('sub_category_id', '=',  $sub_category_id)
+            ->groupBy('books.id')
+            ->get();
         return response()->json([
-            'message' => 'Hikkywananfly'
-        ]);
+            'status' => 'success',
+            'records' => $book_quantity,
+            'books' => $books
+
+        ], 200);
+    }
+
+    public function getSuppliers(Request $request)
+    {
+        try {
+            $sub_category_id = DB::table('sub_categories')->where('slug', $request->sub_slug)->first()->id;
+           
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Not found'
+            ], 500);
+        }
     }
     /**
      * Display a listing of the resource.
