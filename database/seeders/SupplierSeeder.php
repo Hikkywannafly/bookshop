@@ -33,7 +33,19 @@ class SupplierSeeder extends Seeder
                 ],
                 [
                     'name' => 'Nhã Nam',
-                ]
+                ],
+                [
+                    'name' => 'AZ',
+                ],
+                [
+                    'name' => 'SkyBooks',
+                ],
+                [
+                    'name' => 'NXB Phụ nữ',
+                ],
+                [
+                    'name' => 'Biết Nam',
+                ],
             ]
         );
     }

@@ -15,6 +15,7 @@ class CreateBookDetailsTable extends Migration
     {
         Schema::create('book_details', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('book_id')->constrained();
             $table->string('author');
             $table->string('publisher');
             $table->string('publish_year');
@@ -23,7 +24,6 @@ class CreateBookDetailsTable extends Migration
             $table->string('weight');
             $table->string('page_number');
             $table->string('language');
-            $table->text('form');
             $table->timestamps();
         });
     }

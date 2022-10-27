@@ -18,7 +18,9 @@ class CheckCategory
      */
     public function handle(Request $request, Closure $next)
     {
-
+        if ($request->slug == 'all-category') {
+            return $next($request);
+        }
         $slug = Category::where('slug', $request->slug)->first();
         $sub_slug = SubCategory::where('slug', $request->sub_slug)->first();
         if (!$slug) {
