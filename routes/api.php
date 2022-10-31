@@ -4,10 +4,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthSocialController;
+use App\Http\Controllers\BookController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SubCategoryController;
+use App\Models\Book;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 
 /*
@@ -60,11 +62,13 @@ Route::post('/auth/google', [AuthSocialController::class, 'handleLoginGoogle']);
 
 Route::get('/category/{slug}', [CategoryController::class, 'index']);
 
-Route::get('/category/{slug}/{sub_slug}', [SubCategoryController::class, 'index'])->middleware('check.category');
+Route::get('/category/{slug}/{sub_slug}', [SubCategoryController::class, 'index']);
 
 Route::get('/suppliers/{slug}', [CategoryController::class, 'getSuppliers']);
 
 Route::get('/suppliers/{slug}/{sub_slug}', [SubCategoryController::class, 'getSubSuppliers']);
+
+Route::get('/product/{slug}', [BookController::class, 'index']);
 
 // Route::get('/suppliers/{sub_slug}', [SubCategoryController::class, 'getSuppliers']);
 

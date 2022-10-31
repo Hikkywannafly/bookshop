@@ -30,4 +30,12 @@ class Book extends Model
     {
         return $this->hasMany(Rating::class, 'book_id');
     }
+    public function book_detail()
+    {
+        return $this->hasOne(BookDetail::class, 'book_id');
+    }
+    public function images()
+    {
+        return $this->hasMany(Image::class, 'book_id');
+    }
 }

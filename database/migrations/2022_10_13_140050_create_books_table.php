@@ -28,7 +28,6 @@ class CreateBooksTable extends Migration
             $table->foreignId('supplier_id')->constrained();
             $table->foreignId('formality_id')->constrained();
 
-
             // $table->unsignedBigInteger('sub_category_id');
             // $table->foreign('sub_category_id')->references('sub_category_id')->on('category_subcategory');
             // $table->unsignedBigInteger('category_id');

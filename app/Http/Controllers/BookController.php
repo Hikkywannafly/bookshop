@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
 {
@@ -13,9 +15,23 @@ class BookController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $book_query = Book::query()
+            ->with('images')
+            ->with('book_detail')
+            ->with('category')
+            ->with('sub_category')
+            ->with('formality')
+            ->with('supplier')
+            ->with('rating', function ($query) {
+                $query->select('book_id', DB::raw('AVG(rating) as rating'));
+            })
+            ->where('slug', $request->slug);
+        return response()->json([
+            'status' => 'success',
+            'book' => $book_query->first(),
+        ]);
     }
 
     /**

@@ -68,13 +68,48 @@ class SubCategoryController extends Controller
                 $books_query->where('sub_category_id', '=',  $category_id);
                 $suppliers_querry->where('sub_category_id', '=', $category_id);
             }
+            if ($request->supplier) {
+                $books_query->where('supplier_id', '=', $request->supplier);
+                // $suppliers_querry->where('supplier_id', '=', $request->supplier);
+            }
+            $SORTS = [
+                'best' => [
+                    'column' => 'sold',
+                    'order' => 'desc'
+                ],
+                'desc' => [
+                    'column' => 'price',
+                    'order' => 'desc'
+                ],
+                'asc' => [
+                    'column' => 'price',
+                    'order' => 'asc'
+                ],
+                'sale' => [
+                    'column' => 'discount',
+                    'order' => 'desc'
+                ],
+            ];
+            if ($request->sort && array_key_exists($request->sort, $SORTS)) {
+                $books_query->orderBy($SORTS[$request->sort]['column'], $SORTS[$request->sort]['order']);
+            }
+            if ($request->from) {
+                $books_query->where('formality_id', '=', $request->from);
+            }
+            if ($request->price) {
+                $price = explode("-", $request->price);
+                $books_query->whereBetween('price', [$price[0], $price[1]]);
+            }
 
-            $books = $books_query->paginate(4);
+
+            $books = $books_query->paginate(12);
             $suppliers = $suppliers_querry->get();
             return response()->json([
                 'status' => 'success',
                 'books' =>  $books,
                 'suppliers' => $suppliers,
+                'breadcrumbs' => $this->getBreadcrumbs($request->slug, $request->sub_slug),
+
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -84,6 +119,23 @@ class SubCategoryController extends Controller
         }
     }
 
+    public function  getBreadcrumbs($slug, $sub_slug)
+    {
+        $breadcrumbs = [];
+        $category = DB::table('categories')->where('slug', $slug)->first();
+        $breadcrumbs[] = [
+            'name' => $category->name,
+            'slug' => $category->slug,
+        ];
+        if ($sub_slug) {
+            $sub_category = DB::table('sub_categories')->where('slug', $sub_slug)->first();
+            $breadcrumbs[] = [
+                'name' => $sub_category->name,
+                'slug' => $sub_category->slug,
+            ];
+        }
+        return $breadcrumbs;
+    }
     /**
      * Show the form for creating a new resource.
      *

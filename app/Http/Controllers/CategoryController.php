@@ -66,6 +66,7 @@ class CategoryController extends Controller
                     'suppliers.id', 'suppliers.name', 'suppliers.slug', 'suppliers.logo',
                 ])
                 ->groupBy('suppliers.id');
+            $breadcrumbs = [];
             if ($request->slug && $request->slug != 'all-category') {
                 $category_id = DB::table('categories')->where('slug', $request->slug)->first()->id;
                 $books_query->where('category_id', '=', $category_id);
@@ -73,19 +74,44 @@ class CategoryController extends Controller
             }
             if ($request->supplier) {
                 $books_query->where('supplier_id', '=', $request->supplier);
-                $suppliers_querry->where('supplier_id', '=', $request->supplier);
             }
 
+            $SORTS = [
+                'best' => [
+                    'column' => 'sold',
+                    'order' => 'desc'
+                ],
+                'desc' => [
+                    'column' => 'price',
+                    'order' => 'desc'
+                ],
+                'asc' => [
+                    'column' => 'price',
+                    'order' => 'asc'
+                ],
+                'sale' => [
+                    'column' => 'discount',
+                    'order' => 'desc'
+                ],
+            ];
+            if ($request->sort && array_key_exists($request->sort, $SORTS)) {
+                $books_query->orderBy($SORTS[$request->sort]['column'], $SORTS[$request->sort]['order']);
+            }
+            if ($request->from) {
+                $books_query->where('formality_id', '=', $request->from);
+            }
+            if ($request->price) {
+                $price = explode("-", $request->price);
+                $books_query->whereBetween('price', [$price[0], $price[1]]);
+            }
 
-            $books = $books_query->paginate(4);
+            $books = $books_query->paginate(12);
             $suppliers = $suppliers_querry->get();
             return response()->json([
                 'status' => 'success',
                 'books' =>  $books,
                 'suppliers' => $suppliers,
-                'supplier_id' => $request->supplier,
-                'type' => $request,
-
+                'breadcrumbs' => $this->getBreadcrumbs($request->slug),
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -93,6 +119,23 @@ class CategoryController extends Controller
                 'message' => $e->getMessage()
             ], 500);
         }
+    }
+    public function getBreadcrumbs($slug)
+    {
+        $breadcrumbs = [];
+        if ($slug && $slug != 'all-category') {
+            $category = Category::where('slug', $slug)->first();
+            $breadcrumbs[] = [
+                'name' => $category->name,
+                'slug' => $category->slug,
+            ];
+        } else {
+            $breadcrumbs[] = [
+                'name' => 'all category',
+                'slug' => 'all-category',
+            ];
+        }
+        return $breadcrumbs;
     }
 
     /**
