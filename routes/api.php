@@ -1,11 +1,12 @@
 <?php
 
+use App\Http\Controllers\Admin\AuthAdminController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthSocialController;
 use App\Http\Controllers\BookController;
-use App\Http\Controllers\EmailVerificationController;
+
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SubCategoryController;
@@ -58,6 +59,16 @@ Route::group([
     Route::get('/email/testapi1', [VerificationController::class, 'testapi1']);
 });
 
+// admin
+Route::group([
+
+    'middleware' => ['api', 'isApiAdmin'],
+    'prefix' => 'auth'
+], function ($router) {
+
+    Route::get('/admin', [AuthAdminController::class, 'index']);
+});
+
 Route::post('/auth/google', [AuthSocialController::class, 'handleLoginGoogle']);
 
 Route::get('/category/{slug}', [CategoryController::class, 'index']);
@@ -70,7 +81,6 @@ Route::get('/suppliers/{slug}/{sub_slug}', [SubCategoryController::class, 'getSu
 
 Route::get('/product/{slug}', [BookController::class, 'index']);
 
-// Route::get('/suppliers/{sub_slug}', [SubCategoryController::class, 'getSuppliers']);
 
 
 
