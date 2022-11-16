@@ -66,7 +66,6 @@ class CategoryController extends Controller
                     'suppliers.id', 'suppliers.name', 'suppliers.slug', 'suppliers.logo',
                 ])
                 ->groupBy('suppliers.id');
-            $breadcrumbs = [];
             if ($request->slug && $request->slug != 'all-category') {
                 $category_id = DB::table('categories')->where('slug', $request->slug)->first()->id;
                 $books_query->where('category_id', '=', $category_id);

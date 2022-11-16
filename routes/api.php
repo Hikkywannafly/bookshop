@@ -63,10 +63,22 @@ Route::group([
 Route::group([
 
     'middleware' => ['api', 'isApiAdmin'],
-    'prefix' => 'auth'
+    'prefix' => 'auth-admin'
 ], function ($router) {
 
-    Route::get('/admin', [AuthAdminController::class, 'index']);
+    Route::get('/admin1', [AuthAdminController::class, 'index']);
+
+    Route::get('/user', [AuthAdminController::class, 'index']);
+
+    Route::get('/read-product', [AuthAdminController::class, 'readProduct']);
+
+    Route::post('/create-product', [BookController::class, 'store']);
+
+    Route::get('/edit-product/{slug}', [BookController::class, 'edit']);
+
+    Route::patch('/update-product/{slug}', [BookController::class, 'update']);
+
+    Route::delete('/delete-product/{slug}', [BookController::class, 'destroy']);
 });
 
 Route::post('/auth/google', [AuthSocialController::class, 'handleLoginGoogle']);
