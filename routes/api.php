@@ -72,7 +72,7 @@ Route::group([
 
     Route::get('/read-product', [AuthAdminController::class, 'readProduct']);
 
-    Route::post('/create-product', [BookController::class, 'store']);
+    Route::post('/create-product', [AuthAdminController::class, 'create']);
 
     Route::get('/edit-product/{slug}', [BookController::class, 'edit']);
 
@@ -92,6 +92,8 @@ Route::get('/suppliers/{slug}', [CategoryController::class, 'getSuppliers']);
 Route::get('/suppliers/{slug}/{sub_slug}', [SubCategoryController::class, 'getSubSuppliers']);
 
 Route::get('/product/{slug}', [BookController::class, 'index']);
+
+Route::post('/upload', [BookController::class, 'create']);
 
 
 

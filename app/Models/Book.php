@@ -8,6 +8,23 @@ use Illuminate\Database\Eloquent\Model;
 class Book extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'name',
+        'price',
+        'slug',
+        'default_image',
+        'quantity',
+        'sold',
+        'category_id',
+        'sub_category_id',
+        'formality_id',
+        'supplier_id',
+        'status',
+
+    ];
+
+    // time
+
 
     public function category()
     {

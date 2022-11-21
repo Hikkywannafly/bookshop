@@ -39,9 +39,23 @@ class BookController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+
+        $testt = $request->images;
+        foreach ($testt as $key => $value) {
+            $imgName = time() . '.' . $value->extension();
+            $value->move(public_path('images'),  $imgName);
+        }
+        // $name = time() . '.' . $testt->extension();
+        // $testt->move(public_path('images'), $name);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => $testt,
+
+
+        ]);
     }
 
     /**

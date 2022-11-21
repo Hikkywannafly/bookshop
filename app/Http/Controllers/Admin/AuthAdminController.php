@@ -40,4 +40,37 @@ class AuthAdminController extends Controller
             'statistic' => $statistic
         ]);
     }
+    public function create(Request $request)
+    {
+
+        $file = [];
+        $images = $request->file('images');
+        if ($request->file('images')) {
+            foreach ($images as $image) {
+                $name = rand() . time() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path() . '/images/', $name);
+                $file[] = url('/images/' . $name);
+            }
+        }
+        $data = $request->input('data');
+        $data = json_decode($data, true);
+        $book = Book::create([
+            'name' => $data['name'],
+            'price' => 10000,
+            'quantity' => 100,
+            'slug' => $data['slug'],
+            'category_id' => 1,
+            'sub_category_id' => 1,
+            'default_image' => $file[0],
+            'formality_id' => 1,
+            'supplier_id' => 1,
+
+        ]);
+        return response()->json([
+            'status' => 'success',
+            'data' => $request->all(),
+            'test' =>  explode(',', $data['price'])[0],
+
+        ]);
+    }
 }
