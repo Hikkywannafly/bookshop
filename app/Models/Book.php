@@ -20,6 +20,8 @@ class Book extends Model
         'formality_id',
         'supplier_id',
         'status',
+        'created_at',
+        'updated_at',
 
     ];
 

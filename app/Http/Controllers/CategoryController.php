@@ -56,7 +56,7 @@ class CategoryController extends Controller
             $books_query = Book::query()
                 ->leftJoin('ratings', 'books.id', '=', 'ratings.book_id')
                 ->select([
-                    'books.id', 'books.name', 'books.slug', 'books.default_image', 'books.price', 'discount',
+                    'books.id', 'books.name', 'books.slug', 'books.default_image', 'books.price', 'discount', 'books.created_at',
                     DB::raw('AVG(ratings.rating) as rating')
                 ])
                 ->groupBy('books.id');
@@ -92,9 +92,14 @@ class CategoryController extends Controller
                     'column' => 'discount',
                     'order' => 'desc'
                 ],
+                'newest' => [
+                    'column' => 'created_at',
+                    'order' => 'desc'
+                ],
             ];
             if ($request->sort && array_key_exists($request->sort, $SORTS)) {
                 $books_query->orderBy($SORTS[$request->sort]['column'], $SORTS[$request->sort]['order']);
+                // $books_query->latest();
             }
             if ($request->from) {
                 $books_query->where('formality_id', '=', $request->from);
