@@ -24,7 +24,7 @@ class AuthController extends Controller
     public function register(Request $request)
     {
 
-        $validated =  $this->validateData($request);
+        $validated = $this->validateData($request);
 
         if ($validated->fails()) {
             return response()->json(
@@ -171,7 +171,7 @@ class AuthController extends Controller
             'access_token' => $token,
             'token_type' => 'Bearer',
             'expires_in' => FacadesJWTAuth::factory()->getTTL() * 60,
-            'user' => auth()->user()
+            'user' => auth()->user(),
         ]);
     }
 }

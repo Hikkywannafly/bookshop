@@ -98,9 +98,20 @@ class BookController extends Controller
      * @param  \App\Models\Book  $book
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateBookRequest $request, Book $book)
+    public function update(Request $request)
     {
-        //
+        //    update product
+        $book = Book::find($request->id);
+        $book->name = $request->name;
+        $book->slug = $request->slug;
+        $book->price = $request->price;
+        $book->discount = $request->discount;
+        $book->description = $request->description;
+        $book->category_id = $request->category_id;
+        $book->sub_category_id = $request->sub_category_id;
+        $book->formality_id = $request->formality_id;
+        $book->supplier_id = $request->supplier_id;
+        $book->save();
     }
 
     /**
@@ -112,5 +123,42 @@ class BookController extends Controller
     public function destroy(Book $book)
     {
         //
+    }
+
+    public function search(Request $request)
+    {
+        $book_query = Book::query()
+            ->with('category')
+            ->with('sub_category')
+            ->with('formality')
+            ->with('supplier')
+            ->where('name', 'like', '%' . $request->search . '%')
+            ->orWhereHas('category', function ($query) use ($request) {
+                $query->where('name', 'like', '%' . $request->search . '%');
+            })
+            ->orWhereHas('sub_category', function ($query) use ($request) {
+                $query->where('name', 'like', '%' . $request->search . '%');
+            })
+            ->orWhereHas('formality', function ($query) use ($request) {
+                $query->where('name', 'like', '%' . $request->search . '%');
+            })
+            ->orWhereHas('supplier', function ($query) use ($request) {
+                $query->where('name', 'like', '%' . $request->search . '%');
+            })
+            ->limit(7)
+            ->get([
+                'id', 'name', 'slug', 'price', 'discount', 'default_image'
+            ]);
+        if ($book_query->count() > 0) {
+            return response()->json([
+                'status' => 'success',
+                'books' => $book_query,
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'books' => 'Không tìm thấy sản phẩm nào',
+            ]);
+        }
     }
 }

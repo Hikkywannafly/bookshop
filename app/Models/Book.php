@@ -57,4 +57,8 @@ class Book extends Model
     {
         return $this->hasMany(Image::class, 'book_id');
     }
+    public function order_detail()
+    {
+        return $this->hasMany(OrderDetail::class, 'book_id');
+    }
 }

@@ -45,8 +45,6 @@ class AuthAdminController extends Controller
     {
 
         try {
-            // vaidate
-            // check book exist
             $data = json_decode($request->input('data'), true);
             $book = Book::where('name', $data['name'])->first();
             $slug = Book::where('slug', $data['slug'])->first();
@@ -98,12 +96,115 @@ class AuthAdminController extends Controller
                     ]);
                 }
             }
-
             return response()->json([
                 'status' => 'success',
                 'data_test' => $data,
                 'files' => $file,
                 'book' => $book->id,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+    public function update(Request $request)
+    {
+        try {
+            $data = json_decode($request->input('data'), true);
+            $book = Book::where('id', $data['id'])->first();
+            $book->name = $data['name'];
+            $book->price = $data['price'];
+            $book->slug = $data['slug'];
+            $book->quantity = $data['quantity'];
+            $book->category_id = $data['category'];
+            $book->sub_category_id = $data['subCategory'];
+            $book->formality_id = $data['formality'];
+            $book->supplier_id = $data['suppliers'];
+            $book->save();
+
+
+            $file = [];
+            $images = $request->file('images');
+            if ($request->file('images')) {
+                foreach ($images as $image) {
+                    $name = rand() . time() . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path() . '/images/', $name);
+                    $file[] = url('/images/' . $name);
+                }
+                if ($book->images) {
+                    foreach ($book->images as $image) {
+                        $image->delete();
+                    }
+                }
+                foreach ($file as $image) {
+                    if ($image != $file[0]) {
+                        $book->images()->create([
+                            'book_id' => $book->id,
+                            'image_address' => $image,
+                        ]);
+                    }
+                }
+                $book->default_image = $file[0];
+                $book->save();
+            }
+
+
+            if ($book->book_detail) {
+                $book->book_detail()->update([
+                    'publisher' => $data['publisher'],
+                    'publish_year' => $data['publicDate'],
+                    'description' => $data['decription'],
+                    'author' => $data['author'],
+                    'page_number' => $data['pages'],
+                    'language' => $data['language'],
+                    'weight' => '220',
+                    'size' => '30x30x30',
+                ]);
+            } else {
+                $book->book_detail()->create([
+                    'book_id' => $book->id,
+                    'publisher' => $data['publisher'],
+                    'publish_year' => $data['publicDate'],
+                    'description' => $data['decription'],
+                    'author' => $data['author'],
+                    'page_number' => $data['pages'],
+                    'language' => $data['language'],
+                    'weight' => '220',
+                    'size' => '30x30x30',
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'data_test' => $data,
+                'book' => $book,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+    public function delete(Request $request)
+    {
+        try {
+            $book = Book::where('id', $request->id)->first();
+            //    delete bookdetail images
+            if ($book->book_detail) {
+                $book->book_detail->delete();
+            }
+            if ($book->images) {
+                foreach ($book->images as $image) {
+                    $image->delete();
+                }
+            }
+            $book->delete();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Xóa thành công',
             ]);
         } catch (\Exception $e) {
             return response()->json([

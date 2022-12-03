@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthSocialController;
 use App\Http\Controllers\BookController;
-
+use App\Http\Controllers\CartSesstionController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SubCategoryController;
@@ -57,6 +57,14 @@ Route::group([
     Route::get('/verify-email/{id}/{hash}', [VerificationController::class, 'verify'])->name('verification.verify');
 
     Route::get('/email/testapi1', [VerificationController::class, 'testapi1']);
+
+    Route::get('/cart', [CartSesstionController::class, 'index']);
+
+    Route::post('/cart', [CartSesstionController::class, 'create']);
+
+    Route::patch('/cart', [CartSesstionController::class, 'update']);
+
+    Route::delete('/cart1', [CartSesstionController::class, 'destroy']);
 });
 
 // admin
@@ -74,11 +82,11 @@ Route::group([
 
     Route::post('/create-product', [AuthAdminController::class, 'create']);
 
-    Route::get('/edit-product/{slug}', [BookController::class, 'edit']);
+    Route::get('/edit-product/{slug}', [AuthAdminController::class, 'edit']);
 
-    Route::patch('/update-product/{slug}', [BookController::class, 'update']);
+    Route::post('/update-product', [AuthAdminController::class, 'update']);
 
-    Route::delete('/delete-product/{slug}', [BookController::class, 'destroy']);
+    Route::post('/delete-product', [AuthAdminController::class, 'delete']);
 });
 
 Route::post('/auth/google', [AuthSocialController::class, 'handleLoginGoogle']);
@@ -95,6 +103,7 @@ Route::get('/product/{slug}', [BookController::class, 'index']);
 
 Route::post('/upload', [BookController::class, 'create']);
 
+Route::post('/search', [BookController::class, 'search']);
 
 
 

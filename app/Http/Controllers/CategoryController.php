@@ -54,11 +54,34 @@ class CategoryController extends Controller
     {
         try {
             $books_query = Book::query()
-                ->leftJoin('ratings', 'books.id', '=', 'ratings.book_id')
-                ->select([
-                    'books.id', 'books.name', 'books.slug', 'books.default_image', 'books.price', 'discount', 'books.created_at',
-                    DB::raw('AVG(ratings.rating) as rating')
-                ])
+                // ->leftJoin('ratings', 'books.id', '=', 'ratings.book_id')
+                // ->select([
+                //     'books.id', 'books.name', 'books.slug', 'books.default_image', 'books.price', 'discount', 'books.created_at',
+                //     DB::raw('AVG(ratings.rating) as rating')
+                // ])
+                // ->groupBy('books.id');
+                ->with('category')
+                ->with('book_detail')
+                ->with('sub_category')
+                ->with('formality')
+                ->with('supplier')
+                ->with('rating', function ($query) {
+                    $query->select('book_id', DB::raw('AVG(rating) as rating'))
+                        ->groupBy('book_id');
+                })
+                ->orWhere('name', 'like', '%' . $request->search . '%')
+                ->orWhereHas('category', function ($query) use ($request) {
+                    $query->where('name', 'like', '%' . $request->search . '%');
+                })
+                ->orWhereHas('sub_category', function ($query) use ($request) {
+                    $query->where('name', 'like', '%' . $request->search . '%');
+                })
+                ->orWhereHas('formality', function ($query) use ($request) {
+                    $query->where('name', 'like', '%' . $request->search . '%');
+                })
+                ->orWhereHas('supplier', function ($query) use ($request) {
+                    $query->where('name', 'like', '%' . $request->search . '%');
+                })
                 ->groupBy('books.id');
             $suppliers_querry = Book::query()
                 ->leftJoin('suppliers', 'suppliers.id', '=', 'books.supplier_id')
@@ -66,15 +89,38 @@ class CategoryController extends Controller
                     'suppliers.id', 'suppliers.name', 'suppliers.slug', 'suppliers.logo',
                 ])
                 ->groupBy('suppliers.id');
+
             if ($request->slug && $request->slug != 'all-category') {
                 $category_id = DB::table('categories')->where('slug', $request->slug)->first()->id;
                 $books_query->where('category_id', '=', $category_id);
                 $suppliers_querry->where('category_id', '=', $category_id);
             }
+            // if ($request->search) {
+            //     $books_query
+            //         ->orWhere('name', 'like', '%' . $request->search . '%')
+            //         ->orWhereHas('category', function ($query) use ($request) {
+            //             $query->where('name', 'like', '%' . $request->search . '%');
+            //         })
+            //         ->orWhereHas('sub_category', function ($query) use ($request) {
+            //             $query->where('name', 'like', '%' . $request->search . '%');
+            //         })
+            //         ->orWhereHas('formality', function ($query) use ($request) {
+            //             $query->where('name', 'like', '%' . $request->search . '%');
+            //         })
+            //         ->orWhereHas('supplier', function ($query) use ($request) {
+            //             $query->where('name', 'like', '%' . $request->search . '%');
+            //         });
+            // }
             if ($request->supplier) {
-                $books_query->where('supplier_id', '=', $request->supplier);
+                $books_query->orWhere('supplier_id', '=', $request->supplier);
             }
-
+            if ($request->from) {
+                $books_query->orWhere('formality_id', '=', $request->from);
+            }
+            if ($request->price) {
+                $price = explode("-", $request->price);
+                $books_query->orWhereBetween('price', [$price[0], $price[1]]);
+            }
             $SORTS = [
                 'best' => [
                     'column' => 'sold',
@@ -99,14 +145,6 @@ class CategoryController extends Controller
             ];
             if ($request->sort && array_key_exists($request->sort, $SORTS)) {
                 $books_query->orderBy($SORTS[$request->sort]['column'], $SORTS[$request->sort]['order']);
-                // $books_query->latest();
-            }
-            if ($request->from) {
-                $books_query->where('formality_id', '=', $request->from);
-            }
-            if ($request->price) {
-                $price = explode("-", $request->price);
-                $books_query->whereBetween('price', [$price[0], $price[1]]);
             }
 
             $books = $books_query->paginate(12);
