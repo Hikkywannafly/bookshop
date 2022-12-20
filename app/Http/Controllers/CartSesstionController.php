@@ -38,7 +38,13 @@ class CartSesstionController extends Controller
             ->first();
         // total product
         $total_product = $cart_sesstion->cart_items->count('book_id');
-
+        // check quantity of book in cart sesstion enough or not
+        foreach ($cart_sesstion->cart_items as $cart_item) {
+            $book_quantity = Book::query()->where('id', $cart_item->book_id)->first()->quantity;
+            if ($book_quantity < $cart_item->quantity) {
+                $cart_item->error = 'Sản phẩm này' . ' chỉ còn lại ' . $book_quantity . ' sản phẩm. Vui lòng cập nhật lại số lượng trước khi thanh toán.';
+            }
+        }
         return response()->json(
             [
                 'status' => 'success',

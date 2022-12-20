@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Book;
+use App\Models\OrderDetail;
+use App\Models\OrderItem;
 use Illuminate\Support\Facades\DB;
 use IntlChar;
 
@@ -212,5 +214,55 @@ class AuthAdminController extends Controller
                 'message' => $e->getMessage(),
             ]);
         }
+    }
+
+    public function readOrder(Request $request)
+    {
+        $orders = OrderDetail::query()
+            ->with('orderItems')
+            ->with('payment')
+            ->withCount([
+                'orderItems as total_price' => function ($query) {
+                    $query->select(DB::raw('SUM(price * quantity * (1 - discount / 100)) + 18000 '));
+                },
+            ])
+            ->paginate(20);
+        return response()->json([
+            'status' => 'success',
+            'orders' => $orders,
+
+        ]);
+    }
+
+    public function readOrderDetail(Request $request)
+    {
+
+        $order = OrderDetail::query()
+            ->with(
+                'user',
+                function ($query) {
+                    $query->with('userDetail');
+                }
+            )
+            ->with(
+                'orderItems',
+                function ($query) {
+                    $query->with('book');
+                }
+            )
+            ->with('payment')
+            ->withCount([
+                'orderItems as total_price' => function ($query) {
+                    $query->select(DB::raw('SUM(price * quantity * (1 - discount / 100)) + 18000 '));
+                },
+            ])
+            ->where('id', $request->id)
+            ->first();
+
+
+        return response()->json([
+            'status' => 'success',
+            'order' => $order,
+        ]);
     }
 }

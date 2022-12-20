@@ -11,6 +11,12 @@ use Tymon\JWTAuth\Facades\JWTAuth as FacadesJWTAuth;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Auth\Events\Registered;
 use Symfony\Component\HttpFoundation\Response;
+use App\Models\UserDetail;
+use App\Models\Payment;
+use App\Models\OrderDetail;
+use App\Models\OrderItem;
+use App\Models\CartSesstion;
+use App\Models\CartItem;
 
 class AuthController extends Controller
 {
@@ -173,5 +179,99 @@ class AuthController extends Controller
             'expires_in' => FacadesJWTAuth::factory()->getTTL() * 60,
             'user' => auth()->user(),
         ]);
+    }
+
+    public function updateAccount(Request $request)
+    {
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Update account successfully',
+        ], 200);
+    }
+    public function getAccount(Request $request)
+    {
+        $user = auth()->user();
+        $user_detail = UserDetail::where('user_id', $user->id)->first();
+        $payment = Payment::all();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Get account successfully',
+            'userDetail' => $user_detail,
+            'user' => $user,
+            'payment' => $payment
+
+        ], 200);
+    }
+
+    public function order(Request $request)
+    {
+        $user = auth()->user();
+        $payment = Payment::where('id', $request->payment)->first();
+        if ($payment->status === 0) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Phương thức thanh toán hiện không sẵn sàng vui lòng chọn phương thức khác',
+            ], 200);
+        }
+        $user_detail = UserDetail::where('user_id', $user->id)->first();
+        // check phone exist
+        $exist_phone = User::where('phone', $request->phone)->first();
+        if ($user->phone == null && $exist_phone == null) {
+            $user->phone = $request->phone;
+            $user->save();
+        }
+        if ($user_detail == null || $user_detail->address == null) {
+            $user_detail = UserDetail::create(
+                [
+                    'user_id' => $user->id,
+                    'address' => $request->address,
+                    'ward' => $request->ward,
+                    'district' => $request->district,
+                    'province' => $request->province,
+                ]
+            );
+        }
+
+        $order_detail = OrderDetail::create(
+            [
+                'user_id' => $user->id,
+                'payment_id' => $request->payment,
+                'recipient' => $request->name,
+                'address' => $request->address,
+                'province' => $request->province,
+                'district' => $request->district,
+                'ward' => $request->ward,
+                'phone' => $request->phone,
+                'email' => $request->email,
+                'note' => $request->note,
+            ]
+        );
+        $order_detail_id = $order_detail->id;
+        $items = $request->cartItems;
+        foreach ($items as $item) {
+            $order = OrderItem::create(
+                [
+                    'order_detail_id' => $order_detail_id,
+                    'book_id' => $item['id'],
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'],
+                    'discount' => $item['discount'] ?? 0,
+                ]
+            );
+        }
+        // delete cart sesstion
+        $cart_sesstion = CartSesstion::query()->where('user_id', '=', $user->id)->first();
+        foreach ($items as $item) {
+            $cart_item = CartItem::where([
+                ['book_id', '=', $item['id']],
+                ['cart_sesstion_id', '=', $cart_sesstion->id]
+            ])->first()->delete();
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đặt hàng thành công',
+            'cartItems' =>  $cart_item
+        ], 200);
     }
 }

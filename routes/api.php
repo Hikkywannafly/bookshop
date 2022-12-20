@@ -65,6 +65,12 @@ Route::group([
     Route::patch('/cart', [CartSesstionController::class, 'update']);
 
     Route::delete('/cart1', [CartSesstionController::class, 'destroy']);
+
+    Route::post('/update-account', [AuthController::class, 'updateAccount']);
+
+    Route::get('/get-account', [AuthController::class, 'getAccount']);
+
+    Route::post('/order', [AuthController::class, 'order']);
 });
 
 // admin
@@ -87,6 +93,10 @@ Route::group([
     Route::post('/update-product', [AuthAdminController::class, 'update']);
 
     Route::post('/delete-product', [AuthAdminController::class, 'delete']);
+
+    Route::get('/read-order', [AuthAdminController::class, 'readOrder']);
+
+    Route::get('/read-order-detail/{id}', [AuthAdminController::class, 'readOrderDetail']);
 });
 
 Route::post('/auth/google', [AuthSocialController::class, 'handleLoginGoogle']);
