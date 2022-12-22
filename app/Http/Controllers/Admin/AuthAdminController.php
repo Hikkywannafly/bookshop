@@ -9,6 +9,7 @@ use App\Models\OrderDetail;
 use App\Models\OrderItem;
 use Illuminate\Support\Facades\DB;
 use IntlChar;
+use Carbon\Carbon;
 
 class AuthAdminController extends Controller
 {
@@ -225,11 +226,17 @@ class AuthAdminController extends Controller
                 'orderItems as total_price' => function ($query) {
                     $query->select(DB::raw('SUM(price * quantity * (1 - discount / 100)) + 18000 '));
                 },
-            ])
-            ->paginate(20);
+            ]);
+
+
+        if ($request->status) {
+            $orders->where('status', '=', $request->status);
+        }
+        $order =   $orders->paginate(20);
         return response()->json([
             'status' => 'success',
-            'orders' => $orders,
+            'request' => $request->all(),
+            'orders' => $order
 
         ]);
     }
@@ -259,6 +266,22 @@ class AuthAdminController extends Controller
             ->where('id', $request->id)
             ->first();
 
+
+        return response()->json([
+            'status' => 'success',
+            'order' => $order,
+        ]);
+    }
+
+    public function updateOrderStatus(Request $request)
+    {
+
+        $order = OrderDetail::where('id', $request->order_id)->first()
+            ->update([
+                'status' => $request->id,
+                'updated_at' => Carbon::now('Asia/Ho_Chi_Minh'),
+                'total' => $request->total ?? '',
+            ]);
 
         return response()->json([
             'status' => 'success',

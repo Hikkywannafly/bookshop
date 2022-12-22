@@ -17,6 +17,7 @@ use App\Models\OrderDetail;
 use App\Models\OrderItem;
 use App\Models\CartSesstion;
 use App\Models\CartItem;
+use App\Models\Rating;
 
 class AuthController extends Controller
 {
@@ -272,6 +273,35 @@ class AuthController extends Controller
             'status' => 'success',
             'message' => 'Đặt hàng thành công',
             'cartItems' =>  $cart_item
+        ], 200);
+    }
+    public function readRating(Request $request)
+    {
+        $user = auth()->user();
+        $rating = Rating::query()
+            ->with('user')
+            ->where('book_id', '=', $request->book_id)
+            ->get();
+        return response()->json([
+            'status' => 'success',
+            'rating' =>  $rating
+        ], 200);
+    }
+    public function postRating(Request $request)
+    {
+        $user = auth()->user();
+        $rating = Rating::create(
+            [
+                'user_id' => $user->id,
+                'book_id' => $request->book_id,
+                'rating' => $request->rating,
+                'comment' => $request->comment,
+            ]
+        );
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Đánh giá thành công',
+            'request' => $request->all()
         ], 200);
     }
 }

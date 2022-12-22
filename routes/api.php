@@ -71,6 +71,10 @@ Route::group([
     Route::get('/get-account', [AuthController::class, 'getAccount']);
 
     Route::post('/order', [AuthController::class, 'order']);
+
+    Route::get('/read-rating', [AuthController::class, 'readRating']);
+
+    Route::post('/post-rating', [AuthController::class, 'postRating']);
 });
 
 // admin
@@ -97,6 +101,8 @@ Route::group([
     Route::get('/read-order', [AuthAdminController::class, 'readOrder']);
 
     Route::get('/read-order-detail/{id}', [AuthAdminController::class, 'readOrderDetail']);
+
+    Route::post('/update-status-order', [AuthAdminController::class, 'updateOrderStatus']);
 });
 
 Route::post('/auth/google', [AuthSocialController::class, 'handleLoginGoogle']);
